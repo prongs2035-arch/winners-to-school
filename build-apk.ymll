@@ -1,0 +1,44 @@
+
+name: Build Winners to School
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - principale
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Installer Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.5'
+          channel: stable
+
+      - name: Verifier Flutter
+        run: flutter --version
+
+      - name: Installer les dependances
+        run: flutter pub get
+
+      - name: Construire l'APK Android
+        run: flutter build apk --release
+
+      - name: Recuperer l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: winners-to-school-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
