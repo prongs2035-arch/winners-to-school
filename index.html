@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123b75">
+<title>Winners to School</title>
+<style>
+:root{--blue:#123b75;--light:#edf3ff;--green:#16845b;--red:#c0392b}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#17243a}
+header{background:var(--blue);color:white;padding:22px 16px}
+header h1{margin:0 0 7px;font-size:24px}
+header p{margin:0;color:#dce8ff}
+main{max-width:760px;margin:auto;padding:15px}
+.card{background:white;border-radius:14px;padding:17px;margin-bottom:15px;box-shadow:0 2px 9px #142c4c10}
+h2{font-size:18px;margin:0 0 14px}
+label{display:block;font-size:14px;margin:10px 0 5px}
+input,select,button{font:inherit;border-radius:8px;padding:11px;width:100%}
+input,select{border:1px solid #ccd5e3;background:white}
+button{border:0;background:var(--blue);color:white;font-weight:bold;cursor:pointer;margin-top:9px}
+button.secondary{background:#e7edfa;color:var(--blue)}
+button.danger{background:#fff0ee;color:var(--red)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--light);padding:13px;border-radius:10px}
+.stat strong{display:block;font-size:25px;margin-top:6px}
+.small{font-size:13px;color:#627086}
+.subject{border:1px solid #e0e6ef;border-radius:10px;padding:12px;margin:10px 0}
+.subject-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.subject-top strong{overflow-wrap:anywhere}
+.subject-top button{width:auto;padding:7px 10px;margin:0}
+.bad{color:var(--red)}.good{color:var(--green)}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+nav button{width:auto;flex:1;margin:0}
+nav button.active{background:#dce8ff;color:var(--blue)}
+footer{text-align:center;color:#64748b;padding:18px;font-size:12px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+<h1>🏆 Winners to School</h1>
+<p>Ton travail d'aujourd'hui, ta réussite de demain.</p>
+</header>
+<main>
+<section class="card">
+<div class="grid">
+<div><label for="lang">Language / Langue</label>
+<select id="lang"><option value="fr">Français</option><option value="en">English</option></select></div>
+<div><label for="year">Année scolaire</label>
+<input id="year" placeholder="2026-2027" value="2026-2027"></div>
+</div>
+<p class="small" id="saveStatus">Les données sont enregistrées sur cet appareil.</p>
+</section>
+
+<nav>
+<button class="active" data-tab="grades">Mes notes</button>
+<button class="secondary" data-tab="history">Historique</button>
+<button class="secondary" data-tab="help">Aide</button>
+</nav>
+
+<section id="grades" class="tab">
+<div class="card">
+<h2>📊 Résultats</h2>
+<div class="grid">
+<div class="stat">Moyenne générale<strong id="average">— /20</strong></div>
+<div class="stat">Matières à renforcer<strong id="weakCount">0</strong></div>
+</div>
+<p class="small">La moyenne est pondérée par les coefficients des matières.</p>
+</div>
+
+<div class="card">
+<h2>➕ Ajouter une matière ou une note</h2>
+<label for="subject">Nom de la matière</label>
+<input id="subject" placeholder="Ex. : Mathématiques">
+<div class="grid">
+<div><label for="grade">Note sur 20</label><input id="grade" type="number" min="0" max="20" step="0.25" placeholder="12.5"></div>
+<div><label for="coef">Coefficient</label><input id="coef" type="number" min="0.01" max="100" step="0.5" value="1"></div>
+</div>
+<div class="grid">
+<div><label for="sequence">Séquence</label><select id="sequence"><option value="1">Séquence 1</option><option value="2">Séquence 2</option><option value="3">Séquence 3</option><option value="4">Séquence 4</option><option value="5">Séquence 5</option><option value="6">Séquence 6</option></select></div>
+<div><label for="trimester">Trimestre</label><select id="trimester"><option value="1">Trimestre 1</option><option value="2">Trimestre 2</option><option value="3">Trimestre 3</option></select></div>
+</div>
+<button id="add">Enregistrer la note</button>
+</div>
+
+<div class="card">
+<h2>📚 Mes matières</h2>
+<div id="subjectsList"></div>
+<button id="saveSequence" class="secondary">Enregistrer la moyenne de cette séquence</button>
+</div>
+</section>
+
+<section id="history" class="tab hidden">
+<div class="card">
+<h2>🗂️ Historique des séquences</h2>
+<div id="historyList"></div>
+<button id="newYear" class="secondary">Commencer une nouvelle année</button>
+</div>
+</section>
+
+<section id="help" class="tab hidden">
+<div class="card">
+<h2>🎯 Mon plan de révision</h2>
+<p>Les matières où ta moyenne est inférieure à 10/20 apparaissent ici.</p>
+<div id="weakList"></div>
+<p class="small">Cette première version identifie les matières à renforcer. Les résumés automatiques par intelligence artificielle seront ajoutés dans une prochaine version connectée à un service IA.</p>
+</div>
+<div class="card">
+<h2>🔐 Abonnement et compte</h2>
+<p>La connexion sécurisée, les abonnements et les paiements seront intégrés après la mise en place du serveur.</p>
+<p class="small">N'effectue aucun paiement depuis ce prototype.</p>
+</div>
+</section>
+
+<footer>Winners to School · Première version de test</footer>
+</main>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const key='winners-to-school-v1';
+let state={year:'2026-2027',grades:[],history:[]};
+try{
+const saved=JSON.parse(localStorage.getItem(key));
+if(saved&&Array.isArray(saved.grades)&&Array.isArray(saved.history))state=saved;
+}catch(e){}
+$('year').value=state.year;
+function persist(){
+state.year=$('year').value.trim()||'Année scolaire';
+try{
+localStorage.setItem(key,JSON.stringify(state));
+$('saveStatus').textContent='Enregistré sur cet appareil ✓';
+}catch(e){
+$('saveStatus').textContent='Stockage indisponible : note tes résultats ailleurs.';
+}
+}
+function average(items){
+let total=0,coefs=0;
+items.forEach(x=>{total+=x.grade*x.coef;coefs+=x.coef});
+return coefs?total/coefs:null;
+}
+function fmt(n){return n===null?'—':n.toLocaleString('fr-FR',{maximumFractionDigits:2,minimumFractionDigits:2})}
+function render(){
+persist();
+const all=state.grades;
+const avg=average(all);
+$('average').textContent=(avg===null?'—':fmt(avg))+' /20';
+const names=[...new Set(all.map(x=>x.subject.toLowerCase()))];
+const weak=names.filter(n=>{
+const rows=all.filter(x=>x.subject.toLowerCase()===n);
+return average(rows)!==null&&average(rows)<10;
+});
+$('weakCount').textContent=weak.length;
+$('subjectsList').innerHTML='';
+if(!all.length)$('subjectsList').textContent='Aucune note. Ajoute ta première matière ci-dessus.';
+all.forEach(x=>{
+const el=document.createElement('div');
+el.className='subject';
+const top=document.createElement('div');top.className='subject-top';
+const name=document.createElement('strong');name.textContent=x.subject;
+const del=document.createElement('button');del.className='danger';del.textContent='Supprimer';
+del.onclick=()=>{state.grades=state.grades.filter(g=>g.id!==x.id);render()};
+top.append(name,del);
+const detail=document.createElement('p');detail.className='small';
+detail.textContent='Note : '+x.grade+'/20 · Coef. '+x.coef+' · Séquence '+x.sequence+' · Trimestre '+x.trimester;
+const result=document.createElement('p');
+result.className=x.grade<10?'bad':'good';
+result.textContent=x.grade<10?'À renforcer':'Résultat satisfaisant';
+el.append(top,detail,result);$('subjectsList').append(el);
+});
+$('weakList').innerHTML='';
+if(!weak.length)$('weakList').textContent='Ajoute tes notes : les matières à renforcer apparaîtront ici.';
+weak.forEach(n=>{
+const p=document.createElement('p');
+p.textContent=all.find(x=>x.subject.toLowerCase()===n).subject+' : moyenne '+fmt(average(all.filter(x=>x.subject.toLowerCase()===n)))+'/20';
+$('weakList').append(p);
+});
+$('historyList').innerHTML='';
+if(!state.history.length)$('historyList').textContent='Aucune séquence enregistrée.';
+state.history.forEach((h,i)=>{
+const p=document.createElement('p');
+p.textContent=h.year+' · Trimestre '+h.trimester+' · Séquence '+h.sequence+' · Moyenne '+fmt(h.average)+'/20';
+const del=document.createElement('button');del.className='danger';del.textContent='Supprimer';
+del.onclick=()=>{state.history.splice(i,1);render()};
+p.appendChild(del);$('historyList').append(p);
+});
+}
+$('add').onclick=()=>{
+const subject=$('subject').value.trim();
+const grade=Number($('grade').value);
+const coef=Number($('coef').value);
+if(!subject){alert('Entre le nom de la matière.');return}
+if($('grade').value===''||!Number.isFinite(grade)||grade<0||grade>20){alert('Entre une note entre 0 et 20.');return}
+if(!Number.isFinite(coef)||coef<=0){alert('Le coefficient doit être supérieur à zéro.');return}
+state.grades.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),subject,grade,coef,sequence:$('sequence').value,trimester:$('trimester').value});
+$('subject').value='';$('grade').value='';
+render();
+};
+$('saveSequence').onclick=()=>{
+const seq=$('sequence').value,tri=$('trimester').value;
+const rows=state.grades.filter(x=>x.sequence===seq&&x.trimester===tri);
+const avg=average(rows);
+if(avg===null){alert('Ajoute au moins une note pour cette séquence.');return}
+state.history.push({year:$('year').value.trim(),sequence:seq,trimester:tri,average:avg});
+render();alert('Moyenne de la séquence enregistrée.');
+};
+$('newYear').onclick=()=>{
+if(!confirm('Commencer une nouvelle année ? Les notes actuelles seront retirées de cette liste.'))return;
+state.year=prompt('Nom de la nouvelle année scolaire','2027-2028')||state.year;
+state.grades=[];$('year').value=state.year;render();
+};
+$('year').onchange=render;
+document.querySelectorAll('[data-tab]').forEach(btn=>{
+btn.onclick=()=>{
+document.querySelectorAll('.tab').forEach(t=>t.classList.add('hidden'));
+$(btn.dataset.tab).classList.remove('hidden');
+document.querySelectorAll('[data-tab]').forEach(b=>{b.classList.remove('active');b.classList.add('secondary')});
+btn.classList.add('active');btn.classList.remove('secondary');
+};
+});
+$('lang').onchange=()=>{
+alert($('lang').value==='en'?'English interface is planned for a future version.':'Interface française sélectionnée.');
+};
+render();
+})();
+</script>
+</body>
+</html>
