@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-const supabaseUrl = 'TON_URL_SUPABASE';
-const supabaseAnonKey = 'TA_CLE_PUBLIABLE_SUPABASE';
+const supabaseUrl = 'https://uqbxjkuwyqbbjmuohzfu.supabase.co/rest/v1/';
+const supabaseAnonKey = 'sb_publishable_-a4DXxSQTdFIhcpfoytKOg_k6IX2kFd';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
