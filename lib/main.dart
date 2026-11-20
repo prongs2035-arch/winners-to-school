@@ -222,79 +222,197 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _login() async {
-    if (db == null) {
-      _message('Configure d’abord Supabase dans le code.');
-      return;
-    }
+  if (db == null) {
+    _message('Configure d’abord Supabase dans le code.');
+    return;
+  }
 
-    final phone = TextEditingController();
-    final otp = TextEditingController();
-    bool codeSent = false;
+  final name = TextEditingController();
+  final email = TextEditingController();
+  final password = TextEditingController();
+  final phone = TextEditingController();
 
-    await showDialog(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(codeSent
-              ? 'Vérifier le code SMS'
-              : 'Connexion par téléphone'),
-          content: Column(
+  bool isSignup = true;
+  String userType = 'Élève';
+
+  await showDialog(
+    context: context,
+    builder: (dialogContext) => StatefulBuilder(
+      builder: (context, setDialogState) => AlertDialog(
+        title: Text(
+          isSignup ? 'Créer mon compte' : 'Connexion',
+        ),
+        content: SingleChildScrollView(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: phone,
-                keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(
-                  labelText: 'Téléphone avec indicatif (+237...)',
-                ),
-              ),
-              if (codeSent)
+              if (isSignup) ...[
                 TextField(
-                  controller: otp,
-                  keyboardType: TextInputType.number,
+                  controller: name,
                   decoration: const InputDecoration(
-                    labelText: 'Code reçu par SMS',
+                    labelText: 'Nom complet',
                   ),
                 ),
+                const SizedBox(height: 10),
+              ],
+
+              TextField(
+                controller: email,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  labelText: 'Adresse e-mail',
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              TextField(
+                controller: password,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Mot de passe',
+                ),
+              ),
+
+              if (isSignup) ...[
+                const SizedBox(height: 10),
+
+                TextField(
+                  controller: phone,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: 'WhatsApp (+237...)',
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                DropdownButtonFormField<String>(
+                  value: userType,
+                  decoration: const InputDecoration(
+                    labelText: 'Je suis',
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'Élève',
+                      child: Text('Élève'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Étudiant',
+                      child: Text('Étudiant'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      setDialogState(() {
+                        userType = value;
+                      });
+                    }
+                  },
+                ),
+              ],
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Annuler'),
+        ),
+
+        actions: [
+          TextButton(
+            onPressed: () {
+              setDialogState(() {
+                isSignup = !isSignup;
+              });
+            },
+            child: Text(
+              isSignup
+                  ? 'J’ai déjà un compte'
+                  : 'Créer un compte',
             ),
-            FilledButton(
-              onPressed: () async {
-                try {
-                  if (!codeSent) {
-                    await db!.auth.signInWithOtp(
-                      phone: phone.text.trim(),
+          ),
+
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Annuler'),
+          ),
+
+          FilledButton(
+            onPressed: () async {
+              try {
+                if (email.text.trim().isEmpty ||
+                    password.text.isEmpty) {
+                  _message('Remplis l’e-mail et le mot de passe.');
+                  return;
+                }
+
+                if (isSignup) {
+                  if (name.text.trim().isEmpty ||
+                      phone.text.trim().isEmpty) {
+                    _message(
+                      'Remplis ton nom et ton numéro WhatsApp.',
                     );
-                    setDialogState(() => codeSent = true);
+                    return;
+                  }
+
+                  final response = await db!.auth.signUp(
+                    email: email.text.trim(),
+                    password: password.text,
+                    data: {
+                      'full_name': name.text.trim(),
+                      'whatsapp_number': phone.text.trim(),
+                      'user_type': userType,
+                      'preferred_language': 'fr',
+                    },
+                  );
+
+                  if (dialogContext.mounted) {
+                    Navigator.pop(dialogContext);
+                  }
+
+                  if (response.session == null) {
+                    _message(
+                      'Compte créé ! Vérifie ton e-mail '
+                      'pour confirmer ton inscription.',
+                    );
                   } else {
-                    await db!.auth.verifyOTP(
-                      phone: phone.text.trim(),
-                      token: otp.text.trim(),
-                      type: OtpType.sms,
-                    );
-
-                    if (dialogContext.mounted) {
-                      Navigator.pop(dialogContext);
-                    }
-
                     await _loadData();
                     if (mounted) setState(() {});
+                    _message('Bienvenue sur Winners to School !');
                   }
-                } catch (e) {
-                  _message('Connexion impossible : vérifie le numéro et la configuration SMS.');
+                } else {
+                  await db!.auth.signInWithPassword(
+                    email: email.text.trim(),
+                    password: password.text,
+                  );
+
+                  if (dialogContext.mounted) {
+                    Navigator.pop(dialogContext);
+                  }
+
+                  await _loadData();
+                  if (mounted) setState(() {});
+                  _message('Connexion réussie !');
                 }
-              },
-              child: Text(codeSent ? 'Vérifier' : 'Envoyer le code'),
+              } catch (e) {
+                _message(
+                  'Impossible de continuer. Vérifie les informations '
+                  'et réessaie.',
+                );
+              }
+            },
+            child: Text(
+              isSignup ? 'Créer mon compte' : 'Se connecter',
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
+    ),
+  );
+
+  name.dispose();
+  email.dispose();
+  password.dispose();
+  phone.dispose();
   }
 
   Future<void> _chooseProfile() async {
